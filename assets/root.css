@@ -1,0 +1,14 @@
+body {
+  position: absolute;
+  height: 100vh;
+  width: 100vw;
+  background-color: white;
+  color: black;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+div[id="main"] {
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+}

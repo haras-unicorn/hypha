@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/streetsidesoftware/cspell/refs/heads/main/cspell.schema.json
+useGitignore: true
+version: "0.2"
+language: en
+ignorePaths:
+  - "target"
+  - "scripts/flake"
+  - justfile
+  - Cargo.toml
+  - flake.nix
+  - docker-compose.yml
+  - cspell.yaml
+ignoreWords:
+  - justfile
+  - nushell
+  - direnv
+  - thiserror
+  - textareas
+  - shellexpand
+  - dioxus
+  - stylesheet
+  - onclick
+  - oninput
+  - autofocus
+  - onblur
+  - onchange
+  - rnglib
+  - itertools

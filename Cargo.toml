@@ -1,0 +1,35 @@
+[package]
+name = "hypha"
+version = "0.1.0"
+authors = ["haras"]
+edition = "2021"
+
+[dependencies]
+dioxus = { version = "0.6.0", features = ["router", "fullstack"] }
+directories = "6.0.0"
+itertools = "0.14.0"
+log = "0.4.27"
+random_name_generator = "0.3.6"
+serde = { version = "1.0.219", features = ["derive"] }
+shellexpand = "3.1.1"
+thiserror = "2.0.12"
+tokio = { version = "1.44.2", features = ["full"] }
+toml = "0.8.22"
+
+[features]
+default = ["desktop"]
+web = ["dioxus/web"]
+desktop = ["dioxus/desktop"]
+mobile = ["dioxus/mobile"]
+
+[profile]
+
+[profile.wasm-dev]
+inherits = "dev"
+opt-level = 1
+
+[profile.server-dev]
+inherits = "dev"
+
+[profile.android-dev]
+inherits = "dev"
