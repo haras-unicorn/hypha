@@ -1,12 +1,13 @@
 use dioxus::prelude::*;
 
 use crate::board::HyphaBoard;
+use crate::dep::HyphaDep;
 use crate::file::HyphaFile;
 use crate::issue::HyphaIssue;
 use crate::list::HyphaList;
 use crate::r#ref::{
-  HyphaFileBoardRef, HyphaFileIssueRef, HyphaFileListRef, HyphaRef,
-  WithHyphaRef,
+  HyphaBoardIssueRef, HyphaFileBoardRef, HyphaFileIssueRef, HyphaFileListRef,
+  HyphaRef, WithHyphaRef,
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -253,6 +254,57 @@ impl HyphaFileContext {
         dep.left.issue != issue_ref.issue && dep.right.issue != issue_ref.issue
       });
     }
+  }
+
+  pub fn add_file_dep(&mut self, dep: HyphaDep<HyphaFileIssueRef>) {
+    let mut writer = self.signal.write();
+    if !HyphaFileIssueRef::legal(&dep, &*writer) {
+      return;
+    }
+    if writer.deps.contains(&dep) {
+      return;
+    }
+    writer.deps.push(dep);
+  }
+
+  pub fn remove_file_dep(&mut self, dep: HyphaDep<HyphaFileIssueRef>) {
+    self.signal.write().deps.retain(|file_dep| file_dep != &dep);
+  }
+
+  pub fn add_board_dep(
+    &mut self,
+    board: HyphaFileBoardRef,
+    dep: HyphaDep<HyphaBoardIssueRef>,
+  ) {
+    let mut writer = self.signal.write();
+    let board = match board.get_item_from_container_mut(&mut *writer) {
+      Some(board) => board,
+      None => {
+        return;
+      }
+    };
+    if !HyphaBoardIssueRef::legal(&dep, board) {
+      return;
+    }
+    if board.deps.contains(&dep) {
+      return;
+    }
+    board.deps.push(dep);
+  }
+
+  pub fn remove_board_dep(
+    &mut self,
+    board: HyphaFileBoardRef,
+    dep: HyphaDep<HyphaBoardIssueRef>,
+  ) {
+    let mut writer = self.signal.write();
+    let board = match board.get_item_from_container_mut(&mut *writer) {
+      Some(board) => board,
+      None => {
+        return;
+      }
+    };
+    board.deps.retain(|file_dep| file_dep != &dep);
   }
 }
 

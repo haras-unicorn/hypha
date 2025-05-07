@@ -8,8 +8,8 @@ use crate::dep::HyphaDep;
 use crate::item::HyphaItem;
 use crate::list::HyphaList;
 use crate::r#ref::{
-  HyphaFileBoardRef, HyphaFileIssueRef, HyphaFileListRef, HyphaRef,
-  WithHyphaRef,
+  HyphaBoardIssueRef, HyphaFileBoardRef, HyphaFileIssueRef, HyphaFileListRef,
+  HyphaRef, WithHyphaRef,
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -18,7 +18,7 @@ pub struct HyphaBoard {
   #[serde(default)]
   pub lists: Vec<HyphaList>,
   #[serde(default)]
-  pub deps: Vec<HyphaDep<HyphaFileIssueRef>>,
+  pub deps: Vec<HyphaDep<HyphaBoardIssueRef>>,
 }
 
 impl HyphaItem for HyphaBoard {
