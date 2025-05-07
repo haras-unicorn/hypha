@@ -1,11 +1,11 @@
 use serde::{Deserialize, Serialize};
 
 use crate::{
-  board::HyphaBoard, container::HyphaContainer, file::HyphaFile,
+  board::HyphaBoard, container::HyphaContainer, dep::HyphaDep, file::HyphaFile,
   issue::HyphaIssue, item::HyphaItem, list::HyphaList,
 };
 
-pub trait HyphaRef {
+pub trait HyphaRef: Sized {
   type Item: HyphaItem + std::fmt::Debug;
   type Container: HyphaContainer;
 
@@ -19,6 +19,11 @@ pub trait HyphaRef {
   ) -> Option<&'a mut Self::Item>;
   fn remove_item_from_container(&self, container: &mut Self::Container)
     -> bool;
+
+  #[allow(unused_variables, reason = "I want these names in the doc.")]
+  fn legal(dep: &HyphaDep<Self>, container: &Self::Container) -> bool {
+    true
+  }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -91,6 +96,11 @@ impl HyphaRef for HyphaBoardIssueRef {
     }
 
     false
+  }
+
+  #[allow(unused_variables, reason = "I want the name like this.")]
+  fn legal(dep: &HyphaDep<Self>, container: &Self::Container) -> bool {
+    dep.left.stage < dep.right.stage
   }
 }
 
@@ -183,6 +193,15 @@ impl HyphaRef for HyphaFileIssueRef {
     }
 
     false
+  }
+
+  #[allow(unused_variables, reason = "I want the name like this.")]
+  fn legal(dep: &HyphaDep<Self>, container: &Self::Container) -> bool {
+    if dep.left.board == dep.right.board {
+      dep.left.stage < dep.right.stage
+    } else {
+      true
+    }
   }
 }
 
