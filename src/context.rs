@@ -194,7 +194,9 @@ impl HyphaFileContext {
       stage: 0,
       board: issue.r#ref.board.clone(),
     };
-    if issue_ref.get_item_from_container(&self.get()).is_some() {
+    if issue.item.title != issue.r#ref.issue
+      && issue_ref.get_item_from_container(&self.get()).is_some()
+    {
       return;
     }
 
