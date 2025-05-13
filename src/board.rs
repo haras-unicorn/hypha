@@ -3,8 +3,9 @@ use rnglib::{Language, RNG};
 use serde::{Deserialize, Serialize};
 
 use crate::container::HyphaContainer;
-use crate::context::{HyphaBoardContext, HyphaFileContext};
+use crate::context::{HyphaBoardContext, HyphaFileContext, HyphaIssueContext};
 use crate::dep::HyphaDep;
+use crate::issue;
 use crate::item::HyphaItem;
 use crate::list::HyphaList;
 use crate::r#ref::{
@@ -60,6 +61,7 @@ impl Default for HyphaBoard {
 pub fn Component(board_ref: HyphaFileBoardRef) -> Element {
   let mut file_context = use_context::<HyphaFileContext>();
   let mut board_context = use_context::<HyphaBoardContext>();
+  let mut issue_context = use_context::<HyphaIssueContext>();
   let mut edit = use_signal(|| false);
 
   let board = match board_ref.get_item_from_container(&file_context.get()) {
@@ -90,7 +92,12 @@ pub fn Component(board_ref: HyphaFileBoardRef) -> Element {
                 move |e: Event<FormData>| {
                   let mut new_board_ref = board_ref.clone();
                   new_board_ref.board = e.value();
-                  board_context.set(new_board_ref);
+                  board_context.set(new_board_ref.clone());
+
+                  if let Some(mut new_issue_ref) = issue_context.get() {
+                    new_issue_ref.board = new_board_ref.board;
+                    issue_context.set(Some(new_issue_ref));
+                  }
 
                   let mut board = board.clone();
                   board.title = e.value();
