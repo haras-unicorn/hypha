@@ -125,13 +125,9 @@ impl HyphaRef for HyphaFileIssueRef {
       .iter()
       .find(|board| board.title == self.board)
       .and_then(|board| {
-        board
-          .lists
-          .iter()
-          .find(|list| list.title == self.list)
-          .map(|list| {
-            list.issues.iter().find(|issue| issue.title == self.issue)
-          })
+        board.lists.get(self.stage).map(|list| {
+          list.issues.iter().find(|issue| issue.title == self.issue)
+        })
       })
       .flatten()
   }
@@ -145,21 +141,17 @@ impl HyphaRef for HyphaFileIssueRef {
       .iter_mut()
       .find(|board| board.title == self.board)
       .and_then(|board| {
-        board
-          .lists
-          .iter_mut()
-          .find(|list| list.title == self.list)
-          .and_then(|list| {
-            if list.issues.iter().any(|issue| issue.title == self.issue) {
-              list
-                .issues
-                .iter_mut()
-                .find(|issue| issue.title == self.issue)
-            } else {
-              list.issues.push(HyphaIssue::default());
-              list.issues.last_mut()
-            }
-          })
+        board.lists.get_mut(self.stage).and_then(|list| {
+          if list.issues.iter().any(|issue| issue.title == self.issue) {
+            list
+              .issues
+              .iter_mut()
+              .find(|issue| issue.title == self.issue)
+          } else {
+            list.issues.push(HyphaIssue::default());
+            list.issues.last_mut()
+          }
+        })
       })
   }
 
@@ -224,7 +216,7 @@ impl HyphaRef for HyphaFileListRef {
       .boards
       .iter()
       .find(|board| board.title == self.board)
-      .and_then(|board| board.lists.get(self.stage))
+      .and_then(|board| board.lists.iter().find(|list| list.title == self.list))
   }
 
   fn get_item_from_container_mut<'a>(
@@ -235,7 +227,9 @@ impl HyphaRef for HyphaFileListRef {
       .boards
       .iter_mut()
       .find(|board| board.title == self.board)
-      .and_then(|board| board.lists.get_mut(self.stage))
+      .and_then(|board| {
+        board.lists.iter_mut().find(|list| list.title == self.list)
+      })
   }
 
   fn remove_item_from_container(
