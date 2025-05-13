@@ -98,7 +98,7 @@ pub fn BoardProvider(children: Element) -> Element {
     Some(board) => {
       rsx! {
         button {
-          class: "absolute top-0 left-4 mt-4",
+          class: "absolute top-0 left-0 mt-4",
           onclick: move |_| {
             *board_signal.write() = None;
           },
