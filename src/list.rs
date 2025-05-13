@@ -108,7 +108,7 @@ pub fn Component(list_ref: HyphaFileListRef) -> Element {
       }
     }
     div {
-      class: "w-full h-px bg-indigo-500"
+      class: "w-full h-px bg-indigo-500 my-2"
     }
     for issue in list.issues.clone().iter() {
       {
@@ -153,6 +153,9 @@ pub fn Component(list_ref: HyphaFileListRef) -> Element {
           }
         }
       }
+    }
+    div {
+      class: "w-full h-px bg-indigo-500 my-2"
     }
     button {
       onclick: {
