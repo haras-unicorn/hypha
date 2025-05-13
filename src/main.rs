@@ -23,6 +23,7 @@ use dioxus::prelude::*;
 const FAVICON: Asset = asset!("assets/favicon.ico");
 const ROOT_CSS: Asset = asset!("assets/root.css");
 const TAILWIND_CSS: Asset = asset!("assets/tailwind.css");
+const NORMALIZE_CSS: Asset = asset!("assets/normalize.css");
 
 fn main() {
   launch(App);
@@ -35,6 +36,7 @@ fn App() -> Element {
       link { rel: "icon", href: FAVICON }
       link { rel: "stylesheet", href: ROOT_CSS }
       link { rel: "stylesheet", href: TAILWIND_CSS }
+      link { rel: "stylesheet", href: NORMALIZE_CSS }
     }
 
     div {
