@@ -10,6 +10,7 @@ ignorePaths:
   - flake.nix
   - docker-compose.yml
   - cspell.yaml
+  - assets/normalize.css
 ignoreWords:
   - justfile
   - nushell
