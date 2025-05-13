@@ -100,6 +100,11 @@ pub fn Component(list_ref: HyphaFileListRef) -> Element {
           onclick: {
             let list_ref = list_ref.clone();
             move |_| {
+              if let Some(issue_ref) = issue_context.get() {
+                if issue_ref.list == list_ref.list {
+                  issue_context.set(None);
+                }
+              }
               file_context.remove_list(list_ref.clone());
             }
           },
