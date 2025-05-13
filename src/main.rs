@@ -40,7 +40,7 @@ fn App() -> Element {
     }
 
     div {
-      class: "mx-auto mt-2 container flex flex-col",
+      class: "relative mx-auto mt-2 container flex flex-col",
       provider::FileProvider {
         provider::BoardProvider {
           provider::IssueProvider {

@@ -98,50 +98,57 @@ pub fn BoardProvider(children: Element) -> Element {
     Some(board) => {
       rsx! {
         button {
+          class: "absolute top-0 left-4 mt-4",
           onclick: move |_| {
             *board_signal.write() = None;
           },
           "Back"
         }
-        BoardProviderInner {
-          board: board,
-          {children}
+        div {
+          class: "mt-4",
+          BoardProviderInner {
+            board: board,
+            {children}
+          }
         }
       }
     }
     None => {
       rsx! {
-        for board in context.get().boards {
-          div {
-            class: "flex flex-row w-64",
-            p {
-              class: "cursor-pointer grow",
-              onclick: {
-                let board_title = board.title.clone();
-                move |_| {
-                  *board_signal.write() = Some(HyphaFileBoardRef { board: board_title.clone() });
-                }
-              },
-              "{board.title.clone()}"
-            }
-            span {
-              class: "cursor-pointer",
-              onclick: {
-                let board_title = board.title.clone();
-                move |_| {
-                  context.remove_board(HyphaFileBoardRef { board: board_title.clone() });
-                }
-              },
-              "X"
+        div {
+          class: "w-full mt-32 flex flex-col items-center",
+          for board in context.get().boards {
+            div {
+              class: "flex flex-row w-64 mb-4",
+              p {
+                class: "cursor-pointer grow",
+                onclick: {
+                  let board_title = board.title.clone();
+                  move |_| {
+                    *board_signal.write() = Some(HyphaFileBoardRef { board: board_title.clone() });
+                  }
+                },
+                "{board.title.clone()}"
+              }
+              span {
+                class: "cursor-pointer",
+                onclick: {
+                  let board_title = board.title.clone();
+                  move |_| {
+                    context.remove_board(HyphaFileBoardRef { board: board_title.clone() });
+                  }
+                },
+                "X"
+              }
             }
           }
-        }
-        p {
-          class: "cursor-pointer",
-          onclick: move |_| {
-            context.add_board();
-          },
-          "Add"
+          p {
+            class: "cursor-pointer w-24 text-center mt-4",
+            onclick: move |_| {
+              context.add_board();
+            },
+            "Add"
+          }
         }
       }
     }

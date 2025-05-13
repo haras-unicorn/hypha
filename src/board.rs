@@ -81,7 +81,7 @@ pub fn Component(board_ref: HyphaFileBoardRef) -> Element {
       class: "w-full flex flex-row justify-center items-start",
       if edit() {
         div {
-          class: "w-full flex justify-center",
+          class: "w-full flex justify-center mb-8",
           h2 {
             input {
               class: "w-full text-center",
@@ -117,7 +117,7 @@ pub fn Component(board_ref: HyphaFileBoardRef) -> Element {
         }
       } else {
         h2 {
-          class: "text-center cursor-pointer",
+          class: "text-center cursor-pointer mb-8",
           onclick: move |_| {
             *edit.write() = true;
           },
@@ -126,29 +126,31 @@ pub fn Component(board_ref: HyphaFileBoardRef) -> Element {
       }
     }
     div {
-      class: "w-full flex flex-row justify-center items-start overflow-auto",
-      for (idx, list) in board.lists.iter().enumerate() {
-        div {
-          class: "flex flex-col border-indigo-500 border min-w-64 p-2 m-2",
-          crate::list::Component {
-            list_ref: HyphaFileListRef {
-              list: list.title.clone(),
-              stage: idx,
-              board: board.title.clone()
+      class: "w-full flex flex-row",
+      div {
+        class: "grow flex flex-row justify-center items-start overflow-auto",
+        for (idx, list) in board.lists.iter().enumerate() {
+          div {
+            class: "flex flex-col border-indigo-500 border min-w-64 p-2 m-2",
+            crate::list::Component {
+              list_ref: HyphaFileListRef {
+                list: list.title.clone(),
+                stage: idx,
+                board: board.title.clone()
+              }
             }
           }
         }
-        if idx == board.lists.len() - 1 {
-          button {
-            onclick: {
-              let board_ref = board_ref.clone();
-              move |_| {
-                file_context.add_list(board_ref.clone());
-              }
-            },
-            "Add"
+      }
+      button {
+        class: "mx-4",
+        onclick: {
+          let board_ref = board_ref.clone();
+          move |_| {
+            file_context.add_list(board_ref.clone());
           }
-        }
+        },
+        "Add"
       }
     }
   }

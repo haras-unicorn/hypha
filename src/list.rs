@@ -57,7 +57,7 @@ pub fn Component(list_ref: HyphaFileListRef) -> Element {
   rsx! {
     if edit() {
       div {
-        class: "flex flex-row pr-4",
+        class: "flex flex-row pr-4 mb-1",
         h3 {
           class: "grow",
           input {
@@ -85,7 +85,7 @@ pub fn Component(list_ref: HyphaFileListRef) -> Element {
       }
     } else {
       div {
-        class: "flex flex-row pr-4",
+        class: "flex flex-row pr-4 mb-1",
         h3 {
           class: "cursor-pointer grow",
           onclick: {
@@ -116,7 +116,7 @@ pub fn Component(list_ref: HyphaFileListRef) -> Element {
         {
           rsx! {
             div {
-              class: "flex flex-row pr-4",
+              class: "flex flex-row pr-4 mb-2",
               p {
                 class: "grow cursor-pointer",
                 onclick: {
@@ -158,7 +158,7 @@ pub fn Component(list_ref: HyphaFileListRef) -> Element {
       }
     }
     div {
-      class: "w-full h-px bg-indigo-500 my-2"
+      class: "w-full h-px bg-indigo-500 my-2 -mt-1"
     }
     button {
       onclick: {
