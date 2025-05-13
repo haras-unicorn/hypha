@@ -57,7 +57,7 @@ pub fn Component(list_ref: HyphaFileListRef) -> Element {
   rsx! {
     if edit() {
       div {
-        class: "flex flex-row",
+        class: "flex flex-row pr-4",
         h3 {
           class: "grow",
           input {
@@ -85,7 +85,7 @@ pub fn Component(list_ref: HyphaFileListRef) -> Element {
       }
     } else {
       div {
-        class: "flex flex-row",
+        class: "flex flex-row pr-4",
         h3 {
           class: "cursor-pointer grow",
           onclick: {
@@ -110,45 +110,48 @@ pub fn Component(list_ref: HyphaFileListRef) -> Element {
     div {
       class: "w-full h-px bg-indigo-500 my-2"
     }
-    for issue in list.issues.clone().iter() {
-      {
-        rsx! {
-          div {
-            class: "flex flex-row",
-            p {
-              class: "grow cursor-pointer",
-              onclick: {
-                let issue_title = issue.title.clone();
-                let board_title = board_title.clone();
-                let list_title = list.title.clone();
-                move |_| {
-                  issue_context.set(Some(HyphaFileIssueRef {
-                    issue: issue_title.clone(),
-                    list: list_title.clone(),
-                    stage,
-                    board: board_title.clone()
-                  }));
-                }
-              },
-              {issue.title.clone()}
-            }
-            span {
-              class: "cursor-pointer",
-              onclick: {
-                let issue_title = issue.title.clone();
-                let board_title = board_title.clone();
-                let list_title = list.title.clone();
-                move |_| {
-                  let r#ref = HyphaFileIssueRef {
-                    issue: issue_title.clone(),
-                    list: list_title.clone(),
-                    stage,
-                    board: board_title.clone()
-                  };
-                  file_context.remove_issue(r#ref);
-                }
-              },
-              "X"
+    div {
+      class: "max-h-80 overflow-auto",
+      for issue in list.issues.clone().iter() {
+        {
+          rsx! {
+            div {
+              class: "flex flex-row pr-4",
+              p {
+                class: "grow cursor-pointer",
+                onclick: {
+                  let issue_title = issue.title.clone();
+                  let board_title = board_title.clone();
+                  let list_title = list.title.clone();
+                  move |_| {
+                    issue_context.set(Some(HyphaFileIssueRef {
+                      issue: issue_title.clone(),
+                      list: list_title.clone(),
+                      stage,
+                      board: board_title.clone()
+                    }));
+                  }
+                },
+                {issue.title.clone()}
+              }
+              span {
+                class: "cursor-pointer",
+                onclick: {
+                  let issue_title = issue.title.clone();
+                  let board_title = board_title.clone();
+                  let list_title = list.title.clone();
+                  move |_| {
+                    let r#ref = HyphaFileIssueRef {
+                      issue: issue_title.clone(),
+                      list: list_title.clone(),
+                      stage,
+                      board: board_title.clone()
+                    };
+                    file_context.remove_issue(r#ref);
+                  }
+                },
+                "X"
+              }
             }
           }
         }

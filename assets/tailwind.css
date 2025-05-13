@@ -614,6 +614,10 @@ video {
   height: 1px;
 }
 
+.max-h-80 {
+  max-height: 20rem;
+}
+
 .w-64 {
   width: 16rem;
 }
@@ -670,6 +674,10 @@ video {
 
 .p-2 {
   padding: 0.5rem;
+}
+
+.pr-4 {
+  padding-right: 1rem;
 }
 
 .text-center {
