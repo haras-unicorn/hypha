@@ -126,7 +126,7 @@ pub fn Component(board_ref: HyphaFileBoardRef) -> Element {
       }
     }
     div {
-      class: "w-full flex flex-row",
+      class: "w-full flex flex-row items-center",
       div {
         class: "grow flex flex-row justify-center items-start overflow-auto",
         for (idx, list) in board.lists.iter().enumerate() {
@@ -143,7 +143,7 @@ pub fn Component(board_ref: HyphaFileBoardRef) -> Element {
         }
       }
       button {
-        class: "mx-4",
+        class: "px-4 ml-4 h-20 border border-indigo-500",
         onclick: {
           let board_ref = board_ref.clone();
           move |_| {
