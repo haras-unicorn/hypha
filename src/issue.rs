@@ -1,4 +1,5 @@
 use dioxus::prelude::*;
+use dioxus_markdown::Markdown;
 use rnglib::{Language, RNG};
 use serde::{Deserialize, Serialize};
 
@@ -54,7 +55,9 @@ pub fn Component(issue_ref: HyphaFileIssueRef) -> Element {
   rsx! {
     if edit() {
       h5 {
+        class: "h-5 mb-2",
         input {
+          class: "h-full w-full",
           value: issue.title.clone(),
           oninput: {
             let issue_ref = issue_ref.clone();
@@ -75,53 +78,62 @@ pub fn Component(issue_ref: HyphaFileIssueRef) -> Element {
         }
       }
       div {
-        class: "w-full h-px bg-indigo-500"
+        class: "w-full h-px bg-indigo-500 mb-4"
       }
-      p {
-        textarea {
-          class: "w-full resize-none h-64",
-          value: issue.description.clone(),
-          oninput: {
-            let issue_ref = issue_ref.clone();
-            let value = issue.clone();
-            move |e: Event<FormData>| {
-              let mut value = value.clone();
-              value.description = e.value();
-              file_context.update_issue(WithHyphaRef {
-                item: value,
-                r#ref: issue_ref.clone()
-              });
-            }
+      textarea {
+        class: "w-full resize-none h-64 mb-4",
+        value: issue.description.clone(),
+        oninput: {
+          let issue_ref = issue_ref.clone();
+          let value = issue.clone();
+          move |e: Event<FormData>| {
+            let mut value = value.clone();
+            value.description = e.value();
+            file_context.update_issue(WithHyphaRef {
+              item: value,
+              r#ref: issue_ref.clone()
+            });
           }
         }
       }
-      button {
-        onclick: move |_| {
-          *edit.write() = false;
-        },
-        "Preview"
+      p {
+        button {
+          onclick: move |_| {
+            *edit.write() = false;
+          },
+          "Preview"
+        }
       }
     } else {
-      h5 { {issue.title} }
+      h5 {
+        class: "h-5 mb-2",
+        {issue.title}
+      }
       div {
-        class: "w-full h-px bg-indigo-500"
+        class: "w-full h-px bg-indigo-500 mb-4"
       }
       p {
-        class: "h-64",
-        {issue.description}
+        class: "h-64 mb-4",
+        Markdown {
+          src: issue.description.clone()
+        }
       }
-      button {
-        onclick: move |_| {
-          *edit.write() = true;
-        },
-        "Edit"
+      p {
+        button {
+          onclick: move |_| {
+            *edit.write() = true;
+          },
+          "Edit"
+        }
       }
     }
-    button {
-      onclick: move |_| {
-        issue_context.set(None);
-      },
-      "Cancel"
+    p {
+      button {
+        onclick: move |_| {
+          issue_context.set(None);
+        },
+        "Cancel"
+      }
     }
   }
 }
