@@ -54,7 +54,7 @@ pub fn Component(issue_ref: HyphaFileIssueRef) -> Element {
 
   rsx! {
     if edit() {
-      h5 {
+      h3 {
         class: "h-5 mb-2",
         input {
           class: "h-full w-full",
@@ -105,7 +105,7 @@ pub fn Component(issue_ref: HyphaFileIssueRef) -> Element {
         }
       }
     } else {
-      h5 {
+      h3 {
         class: "h-5 mb-2",
         {issue.title}
       }

@@ -13,7 +13,10 @@ pub fn Index() -> Element {
 
   let board_ref = board_context.get();
   rsx! {
-    board::Component { board_ref: board_ref }
+    div {
+      class: "mb-8",
+      board::Component { board_ref: board_ref }
+    }
     if let Some(issue_ref) = issue_context.get() {
       issue::Component { issue_ref: issue_ref }
     }

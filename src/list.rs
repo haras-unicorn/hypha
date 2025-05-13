@@ -113,6 +113,18 @@ pub fn Component(list_ref: HyphaFileListRef) -> Element {
       }
     }
     div {
+      class: "w-full h-px bg-indigo-500 my-2 -mt-1"
+    }
+    button {
+      onclick: {
+        let list_ref = list_ref.clone();
+        move |_| {
+          file_context.add_issue(list_ref.clone());
+        }
+      },
+      "Create"
+    }
+    div {
       class: "w-full h-px bg-indigo-500 my-2"
     }
     div {
@@ -161,18 +173,6 @@ pub fn Component(list_ref: HyphaFileListRef) -> Element {
           }
         }
       }
-    }
-    div {
-      class: "w-full h-px bg-indigo-500 my-2 -mt-1"
-    }
-    button {
-      onclick: {
-        let list_ref = list_ref.clone();
-        move |_| {
-          file_context.add_issue(list_ref.clone());
-        }
-      },
-      "Create"
     }
   }
 }

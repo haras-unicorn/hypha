@@ -5,7 +5,6 @@ use serde::{Deserialize, Serialize};
 use crate::container::HyphaContainer;
 use crate::context::{HyphaBoardContext, HyphaFileContext, HyphaIssueContext};
 use crate::dep::HyphaDep;
-use crate::issue;
 use crate::item::HyphaItem;
 use crate::list::HyphaList;
 use crate::r#ref::{
@@ -131,7 +130,7 @@ pub fn Component(board_ref: HyphaFileBoardRef) -> Element {
         class: "grow flex flex-row justify-center items-start overflow-auto",
         for (idx, list) in board.lists.iter().enumerate() {
           div {
-            class: "flex flex-col border-indigo-500 border min-w-64 p-2 m-2",
+            class: "flex flex-col border-indigo-500 border min-w-64 p-2 mx-2 mb-6",
             crate::list::Component {
               list_ref: HyphaFileListRef {
                 list: list.title.clone(),
