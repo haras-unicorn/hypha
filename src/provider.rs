@@ -116,29 +116,35 @@ pub fn BoardProvider(children: Element) -> Element {
     None => {
       rsx! {
         div {
-          class: "w-full mt-32 flex flex-col items-center",
-          for board in context.get().boards {
+          class: "flex flex-col items-center",
+          div {
+            class: "flex flex-row justify-center",
             div {
-              class: "flex flex-row w-64 mb-4",
-              p {
-                class: "cursor-pointer grow",
-                onclick: {
-                  let board_title = board.title.clone();
-                  move |_| {
-                    *board_signal.write() = Some(HyphaFileBoardRef { board: board_title.clone() });
+              class: "w-80 mt-32 flex flex-col items-center max-h-80 overflow-auto",
+              for board in context.get().boards {
+                div {
+                  class: "flex flex-row w-64 mb-4",
+                  p {
+                    class: "cursor-pointer grow",
+                    onclick: {
+                      let board_title = board.title.clone();
+                      move |_| {
+                        *board_signal.write() = Some(HyphaFileBoardRef { board: board_title.clone() });
+                      }
+                    },
+                    "{board.title.clone()}"
                   }
-                },
-                "{board.title.clone()}"
-              }
-              span {
-                class: "cursor-pointer",
-                onclick: {
-                  let board_title = board.title.clone();
-                  move |_| {
-                    context.remove_board(HyphaFileBoardRef { board: board_title.clone() });
+                  span {
+                    class: "cursor-pointer",
+                    onclick: {
+                      let board_title = board.title.clone();
+                      move |_| {
+                        context.remove_board(HyphaFileBoardRef { board: board_title.clone() });
+                      }
+                    },
+                    "X"
                   }
-                },
-                "X"
+                }
               }
             }
           }

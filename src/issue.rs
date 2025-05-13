@@ -113,7 +113,7 @@ pub fn Component(issue_ref: HyphaFileIssueRef) -> Element {
         class: "w-full h-px bg-indigo-500 mb-4"
       }
       p {
-        class: "h-64 mb-4",
+        class: "h-64 mb-4 overflow-auto",
         Markdown {
           src: issue.description.clone()
         }
