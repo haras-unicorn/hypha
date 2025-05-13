@@ -74,8 +74,12 @@ pub fn Component(issue_ref: HyphaFileIssueRef) -> Element {
           },
         }
       }
+      div {
+        class: "w-full h-px bg-indigo-500"
+      }
       p {
-        input {
+        textarea {
+          class: "w-full resize-none h-64",
           value: issue.description.clone(),
           oninput: {
             let issue_ref = issue_ref.clone();
@@ -99,7 +103,13 @@ pub fn Component(issue_ref: HyphaFileIssueRef) -> Element {
       }
     } else {
       h5 { {issue.title} }
-      p { {issue.description} }
+      div {
+        class: "w-full h-px bg-indigo-500"
+      }
+      p {
+        class: "h-64",
+        {issue.description}
+      }
       button {
         onclick: move |_| {
           *edit.write() = true;
