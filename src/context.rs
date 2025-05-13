@@ -258,6 +258,7 @@ impl HyphaFileContext {
     }
   }
 
+  #[allow(dead_code, reason = "To be continued...")]
   pub fn add_file_dep(&mut self, dep: HyphaDep<HyphaFileIssueRef>) {
     let mut writer = self.signal.write();
     if !HyphaFileIssueRef::legal(&dep, &*writer) {
@@ -269,10 +270,12 @@ impl HyphaFileContext {
     writer.deps.push(dep);
   }
 
+  #[allow(dead_code, reason = "To be continued...")]
   pub fn remove_file_dep(&mut self, dep: HyphaDep<HyphaFileIssueRef>) {
     self.signal.write().deps.retain(|file_dep| file_dep != &dep);
   }
 
+  #[allow(dead_code, reason = "To be continued...")]
   pub fn add_board_dep(
     &mut self,
     board: HyphaFileBoardRef,
@@ -294,6 +297,7 @@ impl HyphaFileContext {
     board.deps.push(dep);
   }
 
+  #[allow(dead_code, reason = "To be continued...")]
   pub fn remove_board_dep(
     &mut self,
     board: HyphaFileBoardRef,
