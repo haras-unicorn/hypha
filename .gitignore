@@ -33,3 +33,4 @@ target/
 .env
 .direnv
 /artifacts
+/assets/tailwind.css
