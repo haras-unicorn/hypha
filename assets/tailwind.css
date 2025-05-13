@@ -622,6 +622,10 @@ video {
   width: 100%;
 }
 
+.min-w-64 {
+  min-width: 16rem;
+}
+
 .grow {
   flex-grow: 1;
 }
@@ -644,6 +648,10 @@ video {
 
 .justify-center {
   justify-content: center;
+}
+
+.overflow-auto {
+  overflow: auto;
 }
 
 .border {

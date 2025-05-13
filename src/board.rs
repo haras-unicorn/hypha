@@ -126,10 +126,10 @@ pub fn Component(board_ref: HyphaFileBoardRef) -> Element {
       }
     }
     div {
-      class: "w-full flex flex-row justify-center items-start",
+      class: "w-full flex flex-row justify-center items-start overflow-auto",
       for (idx, list) in board.lists.iter().enumerate() {
         div {
-          class: "flex flex-col border-indigo-500 border w-64 p-2 m-2",
+          class: "flex flex-col border-indigo-500 border min-w-64 p-2 m-2",
           crate::list::Component {
             list_ref: HyphaFileListRef {
               list: list.title.clone(),
