@@ -1,11 +1,15 @@
+use std::any::Any;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 
+use dioxus::logger::tracing::instrument::WithSubscriber;
 use dioxus::logger::tracing::*;
 use dioxus::prelude::*;
+use dioxus_free_icons::{Icon, IconShape};
 
 use crate::context::{HyphaBoardContext, HyphaFileContext, HyphaIssueContext};
 use crate::file::HyphaFile;
+use crate::hooks::use_initial_render;
 use crate::r#ref::{HyphaFileBoardRef, HyphaFileIssueRef};
 
 #[component]
@@ -71,24 +75,53 @@ pub fn FileProvider(children: Element) -> Element {
 
 #[component]
 fn FileProviderInner(file: HyphaFile, children: Element) -> Element {
-  let signal = use_signal(|| file);
-  use_context_provider(|| HyphaFileContext::new(signal));
+  let file_signal = use_signal(|| file);
+  use_context_provider(|| HyphaFileContext::new(file_signal));
+
+  let mut is_out_of_date = use_signal(|| false);
+  let is_initial_render = use_initial_render()();
+
+  use_effect(move || {
+    let file_changed = matches!(file_signal(), HyphaFile { .. });
+    if file_changed && !is_initial_render {
+      is_out_of_date.set(true);
+    }
+  });
 
   use_drop(move || {
-    if let Err(err) = signal().save() {
+    if let Err(err) = file_signal().save() {
       error!("Failed to save hypha file: {}", err);
     }
   });
 
   rsx! {
-    button {
-      class: "absolute top-0 right-0 mt-4",
-      onclick: move |_| {
-        if let Err(err) = signal().save() {
-          error!("Failed to save hypha file: {}", err);
+    div {
+      class: "absolute top-0 right-0 mt-4 flex flex-row items-start",
+      button {
+        onclick: move |_| {
+          if let Err(err) = file_signal().save() {
+            error!("Failed to save hypha file: {}", err);
+          }
+          is_out_of_date.set(false);
+        },
+        "Save"
+      }
+      if is_out_of_date() {
+        Icon {
+          class: "ml-1 text-gray-500",
+          width: 16,
+          height: 16,
+          icon: dioxus_free_icons::icons::fa_regular_icons::FaCircleDot
         }
-      },
-      "Save"
+      }
+      else {
+        Icon {
+          class: "ml-1 text-green-500",
+          width: 16,
+          height: 16,
+          icon: dioxus_free_icons::icons::fa_regular_icons::FaCircleCheck
+        }
+      }
     }
     { children }
   }
