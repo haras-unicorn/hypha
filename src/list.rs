@@ -77,6 +77,7 @@ pub fn Component(list_ref: HyphaFileListRef) -> Element {
           }
         }
         button {
+          class: "ml-1",
           onclick: move |_| {
             *edit.write() = false;
           },
@@ -87,7 +88,7 @@ pub fn Component(list_ref: HyphaFileListRef) -> Element {
       div {
         class: "flex flex-row pr-4 mb-1",
         h3 {
-          class: "cursor-pointer grow",
+          class: "cursor-pointer grow truncate",
           onclick: {
             move |_| {
               *edit.write() = true;
@@ -96,7 +97,7 @@ pub fn Component(list_ref: HyphaFileListRef) -> Element {
           {list.title.clone()}
         }
         span {
-          class: "cursor-pointer",
+          class: "cursor-pointer ml-1",
           onclick: {
             let list_ref = list_ref.clone();
             move |_| {
@@ -135,7 +136,7 @@ pub fn Component(list_ref: HyphaFileListRef) -> Element {
             div {
               class: "flex flex-row pr-4 mb-2",
               p {
-                class: "grow cursor-pointer",
+                class: "grow cursor-pointer truncate",
                 onclick: {
                   let issue_title = issue.title.clone();
                   let board_title = board_title.clone();
@@ -152,7 +153,7 @@ pub fn Component(list_ref: HyphaFileListRef) -> Element {
                 {issue.title.clone()}
               }
               span {
-                class: "cursor-pointer",
+                class: "cursor-pointer ml-1",
                 onclick: {
                   let issue_title = issue.title.clone();
                   let board_title = board_title.clone();
