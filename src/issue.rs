@@ -1,10 +1,15 @@
 use dioxus::prelude::*;
+use dioxus_free_icons::{
+  icons::fa_regular_icons::{FaCircleXmark, FaEye, FaPenToSquare},
+  Icon,
+};
 use dioxus_markdown::Markdown;
 use rnglib::{Language, RNG};
 use serde::{Deserialize, Serialize};
 
 use crate::{
   context::{HyphaFileContext, HyphaIssueContext},
+  hooks::{use_autofocus, use_autogrow},
   item::HyphaItem,
   r#ref::{HyphaFileIssueRef, HyphaRef, WithHyphaRef},
 };
@@ -39,8 +44,23 @@ pub fn Component(issue_ref: HyphaFileIssueRef) -> Element {
   let mut issue_context = use_context::<HyphaIssueContext>();
   let mut edit = use_signal(|| false);
 
-  let file = file_context.get();
-  let issue = match issue_ref.get_item_from_container(&file) {
+  let file = use_memo(move || file_context.get());
+  let issue = {
+    let issue_ref = issue_ref.clone();
+    use_memo(move || issue_ref.get_item_from_container(&file()).cloned())
+  };
+
+  let issue_description_id = "issue-description";
+  let mut issue_description = use_signal(String::new);
+  use_effect(move || {
+    if let Some(issue) = issue() {
+      issue_description.set(issue.description);
+    }
+  });
+  use_autofocus(edit, &issue_description_id);
+  use_autogrow(edit, &issue_description_id);
+
+  let issue = match issue() {
     Some(issue) => issue.clone(),
     None => {
       return rsx! {
@@ -53,9 +73,57 @@ pub fn Component(issue_ref: HyphaFileIssueRef) -> Element {
   };
 
   rsx! {
+    div {
+      class: "w-full flex flex-row justify-between mb-4",
+      if edit() {
+        button {
+          class: "flex flex-row justify-center",
+          onclick: move |_| {
+            *edit.write() = false;
+          },
+          Icon {
+            class: "mr-2 text-cyan-500 mt-[4px]",
+            width: 20,
+            height: 20,
+            icon: FaEye
+          }
+          span {
+            "Preview issue"
+          }
+        }
+      }
+      else {
+        button {
+          class: "flex flex-row justify-center",
+          onclick: move |_| {
+            *edit.write() = true;
+          },
+          Icon {
+            class: "mr-2 text-cyan-500 mt-[4px]",
+            width: 20,
+            height: 20,
+            icon: FaPenToSquare
+          }
+          span {
+            "Edit issue"
+          }
+        }
+      }
+      button {
+        onclick: move |_| {
+          issue_context.set(None);
+        },
+        Icon {
+          class: "text-grey-500 mt-[5px]",
+          width: 20,
+          height: 20,
+          icon: FaCircleXmark
+        }
+      }
+    }
     if edit() {
       h3 {
-        class: "h-5 mb-2",
+        class: "h-12 mb-2",
         input {
           class: "h-full w-full",
           value: issue.title.clone(),
@@ -78,62 +146,53 @@ pub fn Component(issue_ref: HyphaFileIssueRef) -> Element {
         }
       }
       div {
-        class: "w-full h-px bg-indigo-500 mb-4"
+        class: "w-full h-px bg-zinc-500 mb-4"
       }
-      textarea {
-        class: "w-full resize-none h-64 mb-4",
-        value: issue.description.clone(),
-        oninput: {
-          let issue_ref = issue_ref.clone();
-          let value = issue.clone();
-          move |e: Event<FormData>| {
-            let mut value = value.clone();
-            value.description = e.value();
-            file_context.update_issue(WithHyphaRef {
-              item: value,
-              r#ref: issue_ref.clone()
-            });
+      div {
+        class: "flex flex-row mb-4",
+        code {
+          class: "w-[50%]",
+          textarea {
+            id: issue_description_id,
+            class: "w-full resize-none",
+            value: issue.description.clone(),
+            oninput: {
+              let issue_ref = issue_ref.clone();
+              let value = issue.clone();
+              move |e: Event<FormData>| {
+                let mut value = value.clone();
+                value.description = e.value();
+                file_context.update_issue(WithHyphaRef {
+                  item: value,
+                  r#ref: issue_ref.clone()
+                });
+              }
+            }
           }
         }
-      }
-      p {
-        class: "-mt-[7px]",
-        button {
-          onclick: move |_| {
-            *edit.write() = false;
-          },
-          "Preview"
+        div {
+          class: "h-full w-8"
+        }
+        p {
+          class: "w-[50%] text-wrap break-word",
+          Markdown {
+            src: issue.description.clone()
+          }
         }
       }
     } else {
       h3 {
-        class: "h-5 mb-2 truncate",
+        class: "h-12 mb-2 truncate",
         {issue.title}
       }
       div {
-        class: "w-full h-px bg-indigo-500 mb-4"
+        class: "w-full h-px bg-zinc-500 mb-4"
       }
       p {
-        class: "w-full h-64 mb-4 overflow-auto",
+        class: "w-full mb-4 text-wrap break-word",
         Markdown {
           src: issue.description.clone()
         }
-      }
-      p {
-        button {
-          onclick: move |_| {
-            *edit.write() = true;
-          },
-          "Edit"
-        }
-      }
-    }
-    p {
-      button {
-        onclick: move |_| {
-          issue_context.set(None);
-        },
-        "Cancel"
       }
     }
   }

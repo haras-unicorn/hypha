@@ -4,6 +4,7 @@ use crate::{
   board,
   context::{HyphaBoardContext, HyphaIssueContext},
   issue,
+  resize::VerticalResize,
 };
 
 #[component]
@@ -15,7 +16,9 @@ pub fn Index() -> Element {
   rsx! {
     div {
       class: "mb-8",
-      board::Component { board_ref: board_ref }
+      VerticalResize {
+        board::Component { board_ref: board_ref }
+      }
     }
     if let Some(issue_ref) = issue_context.get() {
       issue::Component { issue_ref: issue_ref }

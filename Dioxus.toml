@@ -1,22 +1,16 @@
-[application]
+#:schema https://raw.githubusercontent.com/umnovI/dioxus-config-schema/refs/heads/main/dioxus.schema.json
 
+[application]
+name = "hypha"
+default_platform = "desktop"
+
+[web.watcher]
 
 [web.app]
 
-# HTML title tag content
-title = "hypha"
-
-# include `assets` in web platform
 [web.resource]
-
-# Additional CSS style files
 style = []
-
-# Additional JavaScript files
 script = []
 
 [web.resource.dev]
-
-# Javascript code file
-# serve: [dev-server] only
 script = []

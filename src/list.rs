@@ -1,8 +1,11 @@
 use dioxus::prelude::*;
+use dioxus_free_icons::icons::fa_regular_icons::{FaCircleXmark, FaSquarePlus};
+use dioxus_free_icons::Icon;
 use rnglib::{Language, RNG};
 use serde::{Deserialize, Serialize};
 
 use crate::context::{HyphaFileContext, HyphaIssueContext};
+use crate::hooks::use_autofocus;
 use crate::issue::HyphaIssue;
 use crate::item::HyphaItem;
 use crate::r#ref::{
@@ -39,6 +42,9 @@ pub fn Component(list_ref: HyphaFileListRef) -> Element {
   let mut issue_context = use_context::<HyphaIssueContext>();
   let mut edit = use_signal(|| false);
 
+  let list_title = format!("list-title-{}", list_ref.stage);
+  use_autofocus(edit, &list_title);
+
   let file = file_context.get();
   let list = match list_ref.get_item_from_container(&file) {
     Some(list) => list.clone(),
@@ -58,10 +64,14 @@ pub fn Component(list_ref: HyphaFileListRef) -> Element {
     if edit() {
       div {
         class: "flex flex-row pr-4 mb-1",
-        h3 {
+        h4 {
           class: "grow",
           input {
+            id: list_title,
             value: list.title.clone(),
+            onblur: move |_| {
+              edit.set(false);
+            },
             oninput: {
               let list_ref = list_ref.clone();
               let list = list.clone();
@@ -76,18 +86,11 @@ pub fn Component(list_ref: HyphaFileListRef) -> Element {
             }
           }
         }
-        button {
-          class: "ml-1",
-          onclick: move |_| {
-            *edit.write() = false;
-          },
-          "Add"
-        }
       }
     } else {
       div {
         class: "flex flex-row pr-4 mb-1",
-        h3 {
+        h4 {
           class: "cursor-pointer grow truncate",
           onclick: {
             move |_| {
@@ -109,24 +112,35 @@ pub fn Component(list_ref: HyphaFileListRef) -> Element {
               file_context.remove_list(list_ref.clone());
             }
           },
-          "X"
+          Icon {
+            class: "text-red-500 mt-[5px]",
+            width: 20,
+            height: 20,
+            icon: FaCircleXmark
+          }
         }
       }
     }
     div {
-      class: "w-full h-px bg-indigo-500 my-2 -mt-1"
+      class: "w-full h-px bg-zinc-500 my-2 -mt-1"
     }
     button {
+      class: "flex flex-row justify-center",
       onclick: {
         let list_ref = list_ref.clone();
         move |_| {
           file_context.add_issue(list_ref.clone());
         }
       },
-      "Create"
+      Icon {
+        class: "text-green-400",
+        width: 24,
+        height: 24,
+        icon: FaSquarePlus
+      }
     }
     div {
-      class: "w-full h-px bg-indigo-500 my-2"
+      class: "w-full h-px bg-zinc-500 my-2"
     }
     div {
       class: "max-h-80 overflow-auto",
@@ -135,7 +149,7 @@ pub fn Component(list_ref: HyphaFileListRef) -> Element {
           rsx! {
             div {
               class: "flex flex-row pr-4 mb-2",
-              p {
+              strong {
                 class: "grow cursor-pointer truncate",
                 onclick: {
                   let issue_title = issue.title.clone();
@@ -168,7 +182,12 @@ pub fn Component(list_ref: HyphaFileListRef) -> Element {
                     file_context.remove_issue(r#ref);
                   }
                 },
-                "X"
+                Icon {
+                  class: "text-red-500 mt-[5px]",
+                  width: 20,
+                  height: 20,
+                  icon: FaCircleXmark
+                }
               }
             }
           }

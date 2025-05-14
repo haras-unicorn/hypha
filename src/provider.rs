@@ -3,6 +3,9 @@ use std::str::FromStr;
 
 use dioxus::logger::tracing::*;
 use dioxus::prelude::*;
+use dioxus_free_icons::icons::fa_regular_icons::{
+  FaCircleLeft, FaCircleXmark, FaSquarePlus,
+};
 use dioxus_free_icons::Icon;
 
 use crate::context::{HyphaBoardContext, HyphaFileContext, HyphaIssueContext};
@@ -102,21 +105,23 @@ fn FileProviderInner(file: HyphaFile, children: Element) -> Element {
           }
           is_out_of_date.set(false);
         },
-        "Save"
+        span {
+          "Save file"
+        }
       }
       if is_out_of_date() {
         Icon {
-          class: "ml-1 text-gray-500",
-          width: 16,
-          height: 16,
+          class: "ml-2 text-gray-500 mt-[5px]",
+          width: 20,
+          height: 20,
           icon: dioxus_free_icons::icons::fa_regular_icons::FaCircleDot
         }
       }
       else {
         Icon {
-          class: "ml-1 text-green-500",
-          width: 16,
-          height: 16,
+          class: "ml-2 text-green-500 mt-[5px]",
+          width: 20,
+          height: 20,
           icon: dioxus_free_icons::icons::fa_regular_icons::FaCircleCheck
         }
       }
@@ -138,11 +143,19 @@ pub fn BoardProvider(children: Element) -> Element {
     Some(board) => {
       rsx! {
         button {
-          class: "absolute top-0 left-0 mt-4",
+          class: "absolute top-0 left-0 mt-4 flex flex-row",
           onclick: move |_| {
             *board_signal.write() = None;
           },
-          "Back"
+          Icon {
+            class: "mr-2 text-grey-500 mt-[4px]",
+            width: 20,
+            height: 20,
+            icon: FaCircleLeft
+          }
+          span {
+            "Back to boards"
+          }
         }
         div {
           class: "mt-4",
@@ -160,12 +173,12 @@ pub fn BoardProvider(children: Element) -> Element {
           div {
             class: "flex flex-row justify-center",
             div {
-              class: "w-80 mt-32 flex flex-col items-center max-h-80 overflow-auto",
+              class: "w-[30rem] mt-32 flex flex-col items-center max-h-[40rem] overflow-auto",
               for board in context.get().boards {
                 div {
-                  class: "flex flex-row w-64 mb-4",
-                  p {
-                    class: "cursor-pointer grow",
+                  class: "flex flex-row w-[26rem] mb-4",
+                  strong {
+                    class: "cursor-pointer grow truncate",
                     onclick: {
                       let board_title = board.title.clone();
                       move |_| {
@@ -182,18 +195,31 @@ pub fn BoardProvider(children: Element) -> Element {
                         context.remove_board(HyphaFileBoardRef { board: board_title.clone() });
                       }
                     },
-                    "X"
+                    Icon {
+                      class: "text-red-500 mt-[5px]",
+                      width: 20,
+                      height: 20,
+                      icon: FaCircleXmark
+                    }
                   }
                 }
               }
             }
           }
-          p {
-            class: "cursor-pointer w-24 text-center mt-4",
+          button {
+            class: "w-40 text-center mt-4 flex flex-row justify-center",
             onclick: move |_| {
               context.add_board();
             },
-            "Add"
+            Icon {
+              class: "mr-2 text-green-500 mt-[4px]",
+              width: 20,
+              height: 20,
+              icon: FaSquarePlus
+            }
+            span {
+              "Add board"
+            }
           }
         }
       }

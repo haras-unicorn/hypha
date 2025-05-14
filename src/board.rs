@@ -1,10 +1,13 @@
 use dioxus::prelude::*;
+use dioxus_free_icons::icons::fa_regular_icons::FaSquarePlus;
+use dioxus_free_icons::Icon;
 use rnglib::{Language, RNG};
 use serde::{Deserialize, Serialize};
 
 use crate::container::HyphaContainer;
 use crate::context::{HyphaBoardContext, HyphaFileContext, HyphaIssueContext};
 use crate::dep::HyphaDep;
+use crate::hooks::use_autofocus;
 use crate::item::HyphaItem;
 use crate::list::HyphaList;
 use crate::r#ref::{
@@ -63,6 +66,9 @@ pub fn Component(board_ref: HyphaFileBoardRef) -> Element {
   let mut issue_context = use_context::<HyphaIssueContext>();
   let mut edit = use_signal(|| false);
 
+  let board_title_input = "board-title-input";
+  use_autofocus(edit, &board_title_input);
+
   let board = match board_ref.get_item_from_container(&file_context.get()) {
     Some(board) => board.clone(),
     None => {
@@ -82,9 +88,14 @@ pub fn Component(board_ref: HyphaFileBoardRef) -> Element {
         div {
           class: "w-full flex justify-center mb-8",
           h2 {
+            class: "w-[39rem]",
             input {
-              class: "w-3xl text-center",
+              id: board_title_input,
+              class: "w-[39rem] text-center",
               value: board.title.clone(),
+              onblur: move |_| {
+                edit.set(false);
+              },
               oninput: {
                 let board_ref = board_ref.clone();
                 let board = board.clone();
@@ -108,17 +119,10 @@ pub fn Component(board_ref: HyphaFileBoardRef) -> Element {
               }
             }
           }
-          button {
-            class: "ml-2",
-            onclick: move |_| {
-              *edit.write() = false;
-            },
-            "Done"
-          }
         }
       } else {
         h2 {
-          class: "max-w-3xl text-center cursor-pointer mb-8 truncate",
+          class: "max-w-[42rem] text-center cursor-pointer mb-8 truncate",
           onclick: move |_| {
             *edit.write() = true;
           },
@@ -132,7 +136,7 @@ pub fn Component(board_ref: HyphaFileBoardRef) -> Element {
         class: "grow flex flex-row justify-center items-start overflow-auto",
         for (idx, list) in board.lists.iter().enumerate() {
           div {
-            class: "flex flex-col border-indigo-500 border min-w-64 p-2 mx-2 mb-6",
+            class: "flex flex-col border-zinc-400 border min-w-64 p-2 mx-2 mb-6",
             crate::list::Component {
               list_ref: HyphaFileListRef {
                 list: list.title.clone(),
@@ -144,14 +148,19 @@ pub fn Component(board_ref: HyphaFileBoardRef) -> Element {
         }
       }
       button {
-        class: "px-4 ml-4 h-20 border border-indigo-500",
+        class: "px-4 ml-4 h-20 border border-green-200",
         onclick: {
           let board_ref = board_ref.clone();
           move |_| {
             file_context.add_list(board_ref.clone());
           }
         },
-        "Add"
+        Icon {
+          class: "text-green-400",
+          width: 24,
+          height: 24,
+          icon: FaSquarePlus
+        }
       }
     }
   }
