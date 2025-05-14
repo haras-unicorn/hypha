@@ -1,11 +1,9 @@
-use std::any::Any;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 
-use dioxus::logger::tracing::instrument::WithSubscriber;
 use dioxus::logger::tracing::*;
 use dioxus::prelude::*;
-use dioxus_free_icons::{Icon, IconShape};
+use dioxus_free_icons::Icon;
 
 use crate::context::{HyphaBoardContext, HyphaFileContext, HyphaIssueContext};
 use crate::file::HyphaFile;
