@@ -11,6 +11,7 @@ mod container;
 mod context;
 mod dep;
 mod file;
+mod hooks;
 mod index;
 mod issue;
 mod item;
