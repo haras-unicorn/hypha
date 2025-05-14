@@ -83,7 +83,7 @@ pub fn Component(board_ref: HyphaFileBoardRef) -> Element {
           class: "w-full flex justify-center mb-8",
           h2 {
             input {
-              class: "w-full text-center",
+              class: "w-3xl text-center",
               value: board.title.clone(),
               oninput: {
                 let board_ref = board_ref.clone();
@@ -109,14 +109,16 @@ pub fn Component(board_ref: HyphaFileBoardRef) -> Element {
             }
           }
           button {
+            class: "ml-2",
             onclick: move |_| {
               *edit.write() = false;
-            }
+            },
+            "Done"
           }
         }
       } else {
         h2 {
-          class: "text-center cursor-pointer mb-8",
+          class: "max-w-3xl text-center cursor-pointer mb-8 truncate",
           onclick: move |_| {
             *edit.write() = true;
           },
