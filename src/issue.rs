@@ -106,7 +106,7 @@ pub fn Component(issue_ref: HyphaFileIssueRef) -> Element {
       }
     } else {
       h3 {
-        class: "h-5 mb-2",
+        class: "h-5 mb-2 truncate",
         {issue.title}
       }
       div {
