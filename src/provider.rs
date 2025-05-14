@@ -81,6 +81,15 @@ fn FileProviderInner(file: HyphaFile, children: Element) -> Element {
   });
 
   rsx! {
+    button {
+      class: "absolute top-0 right-0 mt-4",
+      onclick: move |_| {
+        if let Err(err) = signal().save() {
+          error!("Failed to save hypha file: {}", err);
+        }
+      },
+      "Save"
+    }
     { children }
   }
 }
