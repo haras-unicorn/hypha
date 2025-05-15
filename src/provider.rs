@@ -8,13 +8,16 @@ use dioxus_free_icons::icons::fa_regular_icons::{
 };
 use dioxus_free_icons::Icon;
 
-use crate::context::{HyphaBoardContext, HyphaFileContext, HyphaIssueContext};
+use crate::context::{
+  HyphaBoardContext, HyphaFileContext, HyphaIssueContext, HyphaResizeContext,
+};
 use crate::file::HyphaFile;
-use crate::hooks::use_initial_render;
+use crate::hooks::use_hypha_initial_render;
 use crate::r#ref::{HyphaFileBoardRef, HyphaFileIssueRef};
+use crate::resize::HyphaGlobalResize;
 
 #[component]
-pub fn FileProvider(children: Element) -> Element {
+pub fn HyphaFileProvider(children: Element) -> Element {
   let mut path = use_signal(|| Option::<PathBuf>::None);
 
   let mut file_resource = use_resource(move || async move {
@@ -35,7 +38,7 @@ pub fn FileProvider(children: Element) -> Element {
     UseResourceState::Ready => match &*file_resource.read() {
       Some(file) => match file {
         Some(file) => rsx! {
-          FileProviderInner {
+          HyphaFileProviderInner {
             file: file.clone(),
             {children}
           }
@@ -75,12 +78,12 @@ pub fn FileProvider(children: Element) -> Element {
 }
 
 #[component]
-fn FileProviderInner(file: HyphaFile, children: Element) -> Element {
+fn HyphaFileProviderInner(file: HyphaFile, children: Element) -> Element {
   let file_signal = use_signal(|| file);
   use_context_provider(|| HyphaFileContext::new(file_signal));
 
   let mut is_out_of_date = use_signal(|| false);
-  let is_initial_render = use_initial_render()();
+  let is_initial_render = use_hypha_initial_render()();
 
   use_effect(move || {
     let file_changed = matches!(file_signal(), HyphaFile { .. });
@@ -131,7 +134,7 @@ fn FileProviderInner(file: HyphaFile, children: Element) -> Element {
 }
 
 #[component]
-pub fn BoardProvider(children: Element) -> Element {
+pub fn HyphaBoardProvider(children: Element) -> Element {
   let mut context = use_context::<HyphaFileContext>();
   let mut board_signal = use_signal(|| {
     context.get().boards.first().map(|board| HyphaFileBoardRef {
@@ -159,7 +162,7 @@ pub fn BoardProvider(children: Element) -> Element {
         }
         div {
           class: "mt-4",
-          BoardProviderInner {
+          HyphaBoardProviderInner {
             board: board,
             {children}
           }
@@ -228,7 +231,10 @@ pub fn BoardProvider(children: Element) -> Element {
 }
 
 #[component]
-fn BoardProviderInner(board: HyphaFileBoardRef, children: Element) -> Element {
+fn HyphaBoardProviderInner(
+  board: HyphaFileBoardRef,
+  children: Element,
+) -> Element {
   let signal = use_signal(|| board);
   use_context_provider(|| HyphaBoardContext::new(signal));
 
@@ -238,12 +244,37 @@ fn BoardProviderInner(board: HyphaFileBoardRef, children: Element) -> Element {
 }
 
 #[component]
-pub fn IssueProvider(children: Element) -> Element {
+pub fn HyphaIssueProvider(children: Element) -> Element {
   let signal = use_signal(|| Option::<HyphaFileIssueRef>::None);
   use_context_provider(|| HyphaIssueContext::new(signal));
 
   rsx! {
     { children }
+  }
+}
+
+#[component]
+pub fn HyphaResizeProvider(children: Element) -> Element {
+  let signal = use_signal(|| None as Option<HyphaGlobalResize>);
+  use_context_provider(|| HyphaResizeContext::new(signal));
+
+  if let Some(global_resize) = signal() {
+    rsx! {
+      div {
+        class: "absolute w-full h-full",
+        onmousemove: global_resize.moved,
+        onmouseleave: global_resize.left,
+        onmouseup: global_resize.left,
+        {children}
+      }
+    }
+  } else {
+    rsx! {
+      div {
+        class: "absolute w-full h-full",
+        {children}
+      }
+    }
   }
 }
 

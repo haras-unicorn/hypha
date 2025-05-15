@@ -9,6 +9,7 @@ use crate::r#ref::{
   HyphaBoardIssueRef, HyphaFileBoardRef, HyphaFileIssueRef, HyphaFileListRef,
   HyphaRef, WithHyphaRef,
 };
+use crate::resize::HyphaGlobalResize;
 
 #[derive(Debug, Clone, Copy)]
 pub struct HyphaFileContext {
@@ -23,6 +24,11 @@ pub struct HyphaBoardContext {
 #[derive(Debug, Clone, Copy)]
 pub struct HyphaIssueContext {
   signal: Signal<Option<HyphaFileIssueRef>>,
+}
+
+#[derive(Clone, Copy)]
+pub struct HyphaResizeContext {
+  signal: Signal<Option<HyphaGlobalResize>>,
 }
 
 impl HyphaFileContext {
@@ -339,5 +345,19 @@ impl HyphaIssueContext {
 
   pub fn set(&mut self, issue_ref: Option<HyphaFileIssueRef>) {
     *self.signal.write() = issue_ref;
+  }
+}
+
+impl HyphaResizeContext {
+  pub fn new(signal: Signal<Option<HyphaGlobalResize>>) -> Self {
+    Self { signal }
+  }
+
+  pub fn subscribe(&mut self, global_resize: HyphaGlobalResize) {
+    *self.signal.write() = Some(global_resize);
+  }
+
+  pub fn unsubscribe(&mut self) {
+    *self.signal.write() = None;
   }
 }

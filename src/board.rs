@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use crate::container::HyphaContainer;
 use crate::context::{HyphaBoardContext, HyphaFileContext, HyphaIssueContext};
 use crate::dep::HyphaDep;
-use crate::hooks::use_autofocus;
+use crate::hooks::use_hypha_autofocus;
 use crate::item::HyphaItem;
 use crate::list::HyphaList;
 use crate::r#ref::{
@@ -67,7 +67,7 @@ pub fn Component(board_ref: HyphaFileBoardRef) -> Element {
   let mut edit = use_signal(|| false);
 
   let board_title_input = "board-title-input";
-  use_autofocus(edit, &board_title_input);
+  use_hypha_autofocus(edit, &board_title_input);
 
   let board = match board_ref.get_item_from_container(&file_context.get()) {
     Some(board) => board.clone(),

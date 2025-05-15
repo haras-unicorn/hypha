@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
   context::{HyphaFileContext, HyphaIssueContext},
-  hooks::{use_autofocus, use_autogrow},
+  hooks::{use_hypha_autofocus, use_hypha_autogrow},
   item::HyphaItem,
   r#ref::{HyphaFileIssueRef, HyphaRef, WithHyphaRef},
 };
@@ -57,8 +57,8 @@ pub fn Component(issue_ref: HyphaFileIssueRef) -> Element {
       issue_description.set(issue.description);
     }
   });
-  use_autofocus(edit, &issue_description_id);
-  use_autogrow(edit, &issue_description_id);
+  use_hypha_autofocus(edit, &issue_description_id);
+  use_hypha_autogrow(edit, &issue_description_id);
 
   let issue = match issue() {
     Some(issue) => issue.clone(),

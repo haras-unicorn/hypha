@@ -5,7 +5,7 @@ use rnglib::{Language, RNG};
 use serde::{Deserialize, Serialize};
 
 use crate::context::{HyphaFileContext, HyphaIssueContext};
-use crate::hooks::use_autofocus;
+use crate::hooks::use_hypha_autofocus;
 use crate::issue::HyphaIssue;
 use crate::item::HyphaItem;
 use crate::r#ref::{
@@ -43,7 +43,7 @@ pub fn Component(list_ref: HyphaFileListRef) -> Element {
   let mut edit = use_signal(|| false);
 
   let list_title = format!("list-title-{}", list_ref.stage);
-  use_autofocus(edit, &list_title);
+  use_hypha_autofocus(edit, &list_title);
 
   let file = file_context.get();
   let list = match list_ref.get_item_from_container(&file) {

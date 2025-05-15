@@ -155,12 +155,14 @@ fn App() -> Element {
       style { {text} }
     }
 
-    div {
-      class: "relative mx-auto mt-2 container flex flex-col",
-      provider::FileProvider {
-        provider::BoardProvider {
-          provider::IssueProvider {
-            index::Index {  }
+    provider::HyphaResizeProvider {
+      div {
+        class: "relative mx-auto mt-2 container flex flex-col",
+        provider::HyphaFileProvider {
+          provider::HyphaBoardProvider {
+            provider::HyphaIssueProvider {
+              index::Index {  }
+            }
           }
         }
       }
