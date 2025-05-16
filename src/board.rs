@@ -134,7 +134,8 @@ pub fn Component(board_ref: HyphaFileBoardRef) -> Element {
         let lists = board.lists
           .iter()
           .enumerate()
-          .filter(|(_, list)| list.title.starts_with(&search) || list.issues.iter().any(|issue| issue.title.starts_with(&search)));
+          .filter(|(_, list)| list.title.to_lowercase().starts_with(&search)
+            || list.issues.iter().any(|issue| issue.title.to_lowercase().starts_with(&search)));
         rsx! {
           div {
             class: "grow w-full flex flex-row items-stretch",

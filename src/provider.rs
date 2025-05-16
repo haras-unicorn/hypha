@@ -183,7 +183,7 @@ pub fn HyphaBoardProvider(children: Element) -> Element {
                     .get().boards
                     .iter()
                     .cloned()
-                    .filter(|board| board.title.starts_with(&search))
+                    .filter(|board| board.title.to_lowercase().starts_with(&search))
                     .collect::<Vec<_>>();
                   rsx! {
                     for board in boards {
@@ -326,7 +326,7 @@ pub fn HyphaSearchProvider(
         signal.write().search = e.value();
       }
     }
-    {render(signal.read().search.clone())}
+    {render(signal.read().search.to_lowercase())}
   }
 }
 

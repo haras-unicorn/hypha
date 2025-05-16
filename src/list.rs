@@ -61,10 +61,10 @@ pub fn Component(list_ref: HyphaFileListRef) -> Element {
   let board_title = list_ref.board.clone();
   let stage = list_ref.stage;
   let search = search_context.get();
-  let issues = list
-    .issues
-    .iter()
-    .filter(|issue| issue.title.starts_with(&search));
+  let issues = list.issues.iter().filter(|issue| {
+    issue.title.to_lowercase().starts_with(&search)
+      || list.title.to_lowercase().starts_with(&search)
+  });
 
   rsx! {
     if edit() {
