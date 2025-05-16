@@ -1,6 +1,8 @@
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 
+use dioxus::html::geometry::ClientPoint;
 use dioxus::logger::tracing::*;
 use dioxus::prelude::*;
 use dioxus_free_icons::icons::fa_regular_icons::{
@@ -255,25 +257,38 @@ pub fn HyphaIssueProvider(children: Element) -> Element {
 
 #[component]
 pub fn HyphaResizeProvider(children: Element) -> Element {
-  let signal = use_signal(|| None as Option<HyphaGlobalResize>);
+  let mut signal = use_signal(|| HyphaGlobalResize {
+    position: ClientPoint::zero(),
+    resizes: HashMap::new(),
+  });
   use_context_provider(|| HyphaResizeContext::new(signal));
 
-  if let Some(global_resize) = signal() {
-    rsx! {
-      div {
-        class: "absolute w-full h-full",
-        onmousemove: global_resize.moved,
-        onmouseleave: global_resize.left,
-        onmouseup: global_resize.left,
-        {children}
-      }
-    }
-  } else {
-    rsx! {
-      div {
-        class: "absolute w-full h-full",
-        {children}
-      }
+  rsx! {
+    div {
+      class: "absolute w-full h-full",
+      onmousemove: move |e| {
+        let position_before = signal.read().position;
+        let position_after = e.client_coordinates();
+        let height_difference = position_after.y - position_before.y;
+        let mut writer = signal.write();
+        writer.resizes.iter_mut().for_each(move |(_, (height, dragging))| {
+          *height += (*dragging as i32) * (height_difference as i32)
+        });
+        writer.position = position_after;
+      },
+      onmouseleave: move |_| {
+        let mut writer = signal.write();
+        writer.resizes.iter_mut().for_each(|(_, (_, dragging))| {
+          *dragging = false;
+        });
+      },
+      onmouseup: move |_| {
+        let mut writer = signal.write();
+        writer.resizes.iter_mut().for_each(|(_, (_, dragging))| {
+          *dragging = false;
+        });
+      },
+      {children}
     }
   }
 }

@@ -1,19 +1,20 @@
-use dioxus::prelude::*;
+use std::collections::HashMap;
+
+use dioxus::{html::geometry::ClientPoint, prelude::*};
+use uuid::Uuid;
 
 use crate::context::HyphaResizeContext;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct HyphaGlobalResize {
-  pub moved: EventHandler<Event<MouseData>>,
-  pub left: EventHandler<Event<MouseData>>,
+  pub position: ClientPoint,
+  pub resizes: HashMap<Uuid, (i32, bool)>,
 }
 
 #[component]
 pub fn HyphaVerticalResize(children: Element) -> Element {
   let mut context = use_context::<HyphaResizeContext>();
-  let mut height = use_signal(|| None as Option<i32>);
-  let mut position = use_signal::<(f64, f64)>(|| (0.0, 0.0));
-  let id = use_signal(|| uuid::Uuid::new_v4().to_string());
+  let id = use_signal(|| uuid::Uuid::new_v4());
 
   use_effect(move || {
     spawn(async move {
@@ -22,12 +23,14 @@ pub fn HyphaVerticalResize(children: Element) -> Element {
         id()
       ))
       .await
-      .map(|h| match h {
-        serde_json::Value::Number(h) => h.as_i64().map(|h| h as i32),
+      .map(|height| match height {
+        serde_json::Value::Number(height) => {
+          height.as_i64().map(|height| height as i32)
+        }
         _ => None,
       }) {
-        Ok(Some(h)) => {
-          height.set(Some(h));
+        Ok(Some(height)) => {
+          context.subscribe(id(), height);
         }
         _ => {
           dioxus::logger::tracing::error!("Failed getting height of {}", id());
@@ -36,12 +39,16 @@ pub fn HyphaVerticalResize(children: Element) -> Element {
     });
   });
 
+  use_drop(move || {
+    context.unsubscribe(&id());
+  });
+
   rsx! {
     div {
       div {
         class: "w-full overflow-hidden",
-        id: id(),
-        style: match height() {
+        id: id().to_string(),
+        style: match context.height(&id()) {
           Some(height) => format!("height: {height}px;"),
           None => String::new(),
         },
@@ -49,26 +56,8 @@ pub fn HyphaVerticalResize(children: Element) -> Element {
       }
       div {
         class: "w-full h-1 bg-zinc-500 cursor-row-resize",
-        onmousedown: move |e: Event<MouseData>| {
-          let coordinates = e.client_coordinates();
-          position.set((coordinates.x, coordinates.y));
-          context.subscribe(HyphaGlobalResize {
-            moved: EventHandler::new(move |e: Event<MouseData>| {
-              let coordinates = e.client_coordinates();
-              let mx = coordinates.x;
-              let my = coordinates.y;
-              if let Some(oh) = height() {
-                let (_, y) = position();
-                let dy = my - y;
-                let h = oh + dy as i32;
-                height.set(Some(h));
-              }
-              position.set((mx, my));
-            }),
-            left: EventHandler::new(move |_: Event<MouseData>| {
-              context.unsubscribe();
-            })
-          });
+        onmousedown: move |_| {
+          context.dragging(&id());
         }
       }
     }

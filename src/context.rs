@@ -1,4 +1,5 @@
 use dioxus::prelude::*;
+use uuid::Uuid;
 
 use crate::board::HyphaBoard;
 use crate::dep::HyphaDep;
@@ -28,7 +29,7 @@ pub struct HyphaIssueContext {
 
 #[derive(Clone, Copy)]
 pub struct HyphaResizeContext {
-  signal: Signal<Option<HyphaGlobalResize>>,
+  signal: Signal<HyphaGlobalResize>,
 }
 
 impl HyphaFileContext {
@@ -349,15 +350,30 @@ impl HyphaIssueContext {
 }
 
 impl HyphaResizeContext {
-  pub fn new(signal: Signal<Option<HyphaGlobalResize>>) -> Self {
+  pub fn new(signal: Signal<HyphaGlobalResize>) -> Self {
     Self { signal }
   }
 
-  pub fn subscribe(&mut self, global_resize: HyphaGlobalResize) {
-    *self.signal.write() = Some(global_resize);
+  pub fn subscribe(&mut self, id: Uuid, height: i32) {
+    self.signal.write().resizes.insert(id, (height, false));
   }
 
-  pub fn unsubscribe(&mut self) {
-    *self.signal.write() = None;
+  pub fn unsubscribe(&mut self, id: &Uuid) {
+    self.signal.write().resizes.remove(&id);
+  }
+
+  pub fn dragging(&mut self, id: &Uuid) {
+    if let Some((_, dragging)) = self.signal.write().resizes.get_mut(id) {
+      *dragging = true;
+    }
+  }
+
+  pub fn height(&self, id: &Uuid) -> Option<i32> {
+    self
+      .signal
+      .read()
+      .resizes
+      .get(id)
+      .map(|(height, _)| *height)
   }
 }
