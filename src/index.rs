@@ -15,13 +15,16 @@ pub fn Index() -> Element {
   let board_ref = board_context.get();
   rsx! {
     HyphaVerticalResize {
-      div {
-        class: "mb-8",
-        board::Component { board_ref: board_ref }
-      }
+      class: "mb-8 flex flex-col",
+      min: "30vh",
+      max: "70vh",
+      board::Component { board_ref: board_ref }
     }
     if let Some(issue_ref) = issue_context.get() {
-      issue::Component { issue_ref: issue_ref }
+      div {
+        class: "mt-8",
+        issue::Component { issue_ref: issue_ref }
+      }
     } else {
       div { class: "grow" }
     }

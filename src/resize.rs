@@ -12,7 +12,18 @@ pub struct HyphaGlobalResize {
 }
 
 #[component]
-pub fn HyphaVerticalResize(children: Element) -> Element {
+pub fn HyphaVerticalResize(
+  class: Option<String>,
+  style: Option<String>,
+  min: Option<String>,
+  max: Option<String>,
+  children: Element,
+) -> Element {
+  let class = class.unwrap_or(String::new());
+  let style = style.unwrap_or(String::new());
+  let min = min.unwrap_or_else(|| "1px".to_string());
+  let max = max.unwrap_or_else(|| "100vh".to_string());
+
   let mut context = use_context::<HyphaResizeContext>();
   let id = use_signal(|| uuid::Uuid::new_v4());
 
@@ -45,20 +56,18 @@ pub fn HyphaVerticalResize(children: Element) -> Element {
 
   rsx! {
     div {
-      div {
-        class: "w-full overflow-hidden",
-        id: id().to_string(),
-        style: match context.height(&id()) {
-          Some(height) => format!("height: {height}px;"),
-          None => String::new(),
-        },
-        {children}
-      }
-      div {
-        class: "w-full h-1 bg-zinc-500 cursor-row-resize",
-        onmousedown: move |_| {
-          context.dragging(&id());
-        }
+      id: id().to_string(),
+      class: class + " relative justify-start w-full grow overflow-hidden flex flex-col",
+      style: match context.height(&id()) {
+        Some(height) => format!("height: clamp({min}, {height}px, {max}); {style}"),
+        None => style,
+      },
+      {children}
+    }
+    div {
+      class: "w-full h-1 bg-zinc-500 cursor-row-resize",
+      onmousedown: move |_| {
+        context.dragging(&id());
       }
     }
   }

@@ -4,7 +4,7 @@ use dioxus_free_icons::Icon;
 use rnglib::{Language, RNG};
 use serde::{Deserialize, Serialize};
 
-use crate::context::{HyphaFileContext, HyphaIssueContext};
+use crate::context::{HyphaFileContext, HyphaIssueContext, HyphaSearchContext};
 use crate::hooks::use_hypha_autofocus;
 use crate::issue::HyphaIssue;
 use crate::item::HyphaItem;
@@ -40,6 +40,7 @@ impl Default for HyphaList {
 pub fn Component(list_ref: HyphaFileListRef) -> Element {
   let mut file_context = use_context::<HyphaFileContext>();
   let mut issue_context = use_context::<HyphaIssueContext>();
+  let search_context = use_context::<HyphaSearchContext>();
   let mut edit = use_signal(|| false);
 
   let list_title = format!("list-title-{}", list_ref.stage);
@@ -59,6 +60,11 @@ pub fn Component(list_ref: HyphaFileListRef) -> Element {
   };
   let board_title = list_ref.board.clone();
   let stage = list_ref.stage;
+  let search = search_context.get();
+  let issues = list
+    .issues
+    .iter()
+    .filter(|issue| issue.title.starts_with(&search));
 
   rsx! {
     if edit() {
@@ -122,7 +128,7 @@ pub fn Component(list_ref: HyphaFileListRef) -> Element {
       }
     }
     div {
-      class: "w-full h-px bg-zinc-500 my-2 -mt-1"
+      class: "h-px bg-zinc-500 my-2 -mt-1"
     }
     button {
       class: "flex flex-row justify-center",
@@ -140,11 +146,11 @@ pub fn Component(list_ref: HyphaFileListRef) -> Element {
       }
     }
     div {
-      class: "w-full h-px bg-zinc-500 my-2"
+      class: "h-px bg-zinc-500 my-2"
     }
     div {
-      class: "max-h-80 overflow-auto",
-      for issue in list.issues.clone().iter() {
+      class: "overflow-auto",
+      for issue in issues {
         {
           rsx! {
             div {

@@ -19,6 +19,7 @@ mod list;
 mod provider;
 mod r#ref;
 mod resize;
+mod search;
 
 use dioxus::prelude::*;
 
@@ -157,7 +158,7 @@ fn App() -> Element {
 
     provider::HyphaResizeProvider {
       div {
-        class: "relative mx-auto mt-2 container flex flex-col",
+        class: "relative mx-auto mt-8 container flex flex-col",
         provider::HyphaFileProvider {
           provider::HyphaBoardProvider {
             provider::HyphaIssueProvider {

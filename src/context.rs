@@ -11,6 +11,7 @@ use crate::r#ref::{
   HyphaRef, WithHyphaRef,
 };
 use crate::resize::HyphaGlobalResize;
+use crate::search::HyphaSearch;
 
 #[derive(Debug, Clone, Copy)]
 pub struct HyphaFileContext {
@@ -30,6 +31,11 @@ pub struct HyphaIssueContext {
 #[derive(Clone, Copy)]
 pub struct HyphaResizeContext {
   signal: Signal<HyphaGlobalResize>,
+}
+
+#[derive(Clone, Copy)]
+pub struct HyphaSearchContext {
+  signal: Signal<HyphaSearch>,
 }
 
 impl HyphaFileContext {
@@ -375,5 +381,15 @@ impl HyphaResizeContext {
       .resizes
       .get(id)
       .map(|(height, _)| *height)
+  }
+}
+
+impl HyphaSearchContext {
+  pub fn new(signal: Signal<HyphaSearch>) -> Self {
+    Self { signal }
+  }
+
+  pub fn get(&self) -> String {
+    self.signal.read().search.clone()
   }
 }

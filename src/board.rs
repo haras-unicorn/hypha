@@ -10,6 +10,7 @@ use crate::dep::HyphaDep;
 use crate::hooks::use_hypha_autofocus;
 use crate::item::HyphaItem;
 use crate::list::HyphaList;
+use crate::provider::HyphaSearchProvider;
 use crate::r#ref::{
   HyphaBoardIssueRef, HyphaFileBoardRef, HyphaFileIssueRef, HyphaFileListRef,
   HyphaRef, WithHyphaRef,
@@ -83,46 +84,43 @@ pub fn Component(board_ref: HyphaFileBoardRef) -> Element {
 
   rsx! {
     div {
-      class: "w-full flex flex-row justify-center items-start",
+      class: "w-full flex justify-center items-start mb-8",
       if edit() {
-        div {
-          class: "w-full flex justify-center mb-8",
-          h2 {
-            class: "w-[39rem]",
-            input {
-              id: board_title_input,
-              class: "w-[39rem] text-center",
-              value: board.title.clone(),
-              onblur: move |_| {
-                edit.set(false);
-              },
-              oninput: {
-                let board_ref = board_ref.clone();
-                let board = board.clone();
-                move |e: Event<FormData>| {
-                  let mut new_board_ref = board_ref.clone();
-                  new_board_ref.board = e.value();
-                  board_context.set(new_board_ref.clone());
+        h2 {
+          class: "w-[39rem]",
+          input {
+            id: board_title_input,
+            class: "w-[39rem] text-center",
+            value: board.title.clone(),
+            onblur: move |_| {
+              edit.set(false);
+            },
+            oninput: {
+              let board_ref = board_ref.clone();
+              let board = board.clone();
+              move |e: Event<FormData>| {
+                let mut new_board_ref = board_ref.clone();
+                new_board_ref.board = e.value();
+                board_context.set(new_board_ref.clone());
 
-                  if let Some(mut new_issue_ref) = issue_context.get() {
-                    new_issue_ref.board = new_board_ref.board;
-                    issue_context.set(Some(new_issue_ref));
-                  }
-
-                  let mut board = board.clone();
-                  board.title = e.value();
-                  file_context.update_board(WithHyphaRef {
-                    item: board,
-                    r#ref: board_ref.clone()
-                  });
+                if let Some(mut new_issue_ref) = issue_context.get() {
+                  new_issue_ref.board = new_board_ref.board;
+                  issue_context.set(Some(new_issue_ref));
                 }
+
+                let mut board = board.clone();
+                board.title = e.value();
+                file_context.update_board(WithHyphaRef {
+                  item: board,
+                  r#ref: board_ref.clone()
+                });
               }
             }
           }
         }
       } else {
         h2 {
-          class: "max-w-[42rem] text-center cursor-pointer mb-8 truncate",
+          class: "max-w-[42rem] text-center cursor-pointer truncate",
           onclick: move |_| {
             *edit.write() = true;
           },
@@ -130,38 +128,51 @@ pub fn Component(board_ref: HyphaFileBoardRef) -> Element {
         }
       }
     }
-    div {
-      class: "w-full flex flex-row items-center",
-      div {
-        class: "grow flex flex-row justify-center items-start overflow-auto",
-        for (idx, list) in board.lists.iter().enumerate() {
+    HyphaSearchProvider {
+      class: "mb-4 max-w-48 ml-2",
+      render: use_callback(move |search| {
+        let lists = board.lists
+          .iter()
+          .enumerate()
+          .filter(|(_, list)| list.title.starts_with(&search) || list.issues.iter().any(|issue| issue.title.starts_with(&search)));
+        rsx! {
           div {
-            class: "flex flex-col border-zinc-400 border min-w-64 p-2 mx-2 mb-6",
-            crate::list::Component {
-              list_ref: HyphaFileListRef {
-                list: list.title.clone(),
-                stage: idx,
-                board: board.title.clone()
+            class: "grow w-full flex flex-row items-stretch",
+            style: "max-height: calc(100% - 100px);",
+            div {
+              class: "h-full grow flex flex-row justify-center items-start overflow-auto",
+              for (idx, list) in lists {
+                div {
+                  class: "flex flex-col justify-start border-zinc-400 border min-w-64 p-2 mx-2 mb-6",
+                  style: "max-height: calc(100% - 40px);",
+                  crate::list::Component {
+                    list_ref: HyphaFileListRef {
+                      list: list.title.clone(),
+                      stage: idx,
+                      board: board.title.clone()
+                    }
+                  }
+                }
+              }
+            }
+            button {
+              class: "px-4 ml-4 h-20 border border-green-200",
+              onclick: {
+                let board_ref = board_ref.clone();
+                move |_| {
+                  file_context.add_list(board_ref.clone());
+                }
+              },
+              Icon {
+                class: "text-green-400",
+                width: 24,
+                height: 24,
+                icon: FaSquarePlus
               }
             }
           }
         }
-      }
-      button {
-        class: "px-4 ml-4 h-20 border border-green-200",
-        onclick: {
-          let board_ref = board_ref.clone();
-          move |_| {
-            file_context.add_list(board_ref.clone());
-          }
-        },
-        Icon {
-          class: "text-green-400",
-          width: 24,
-          height: 24,
-          icon: FaSquarePlus
-        }
-      }
+      })
     }
   }
 }

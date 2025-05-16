@@ -12,11 +12,13 @@ use dioxus_free_icons::Icon;
 
 use crate::context::{
   HyphaBoardContext, HyphaFileContext, HyphaIssueContext, HyphaResizeContext,
+  HyphaSearchContext,
 };
 use crate::file::HyphaFile;
 use crate::hooks::use_hypha_initial_render;
 use crate::r#ref::{HyphaFileBoardRef, HyphaFileIssueRef};
 use crate::resize::HyphaGlobalResize;
+use crate::search::HyphaSearch;
 
 #[component]
 pub fn HyphaFileProvider(children: Element) -> Element {
@@ -101,18 +103,16 @@ fn HyphaFileProviderInner(file: HyphaFile, children: Element) -> Element {
   });
 
   rsx! {
-    div {
-      class: "absolute top-0 right-0 mt-4 flex flex-row items-start",
-      button {
-        onclick: move |_| {
-          if let Err(err) = file_signal().save() {
-            error!("Failed to save hypha file: {}", err);
-          }
-          is_out_of_date.set(false);
-        },
-        span {
-          "Save file"
+    button {
+      class: "absolute top-0 right-0 flex flex-row items-start z-10",
+      onclick: move |_| {
+        if let Err(err) = file_signal().save() {
+          error!("Failed to save hypha file: {}", err);
         }
+        is_out_of_date.set(false);
+      },
+      span {
+        "Save file"
       }
       if is_out_of_date() {
         Icon {
@@ -148,7 +148,7 @@ pub fn HyphaBoardProvider(children: Element) -> Element {
     Some(board) => {
       rsx! {
         button {
-          class: "absolute top-0 left-0 mt-4 flex flex-row",
+          class: "absolute top-0 left-0 flex flex-row z-10",
           onclick: move |_| {
             *board_signal.write() = None;
           },
@@ -162,12 +162,9 @@ pub fn HyphaBoardProvider(children: Element) -> Element {
             "Back to boards"
           }
         }
-        div {
-          class: "mt-4",
-          HyphaBoardProviderInner {
-            board: board,
-            {children}
-          }
+        HyphaBoardProviderInner {
+          board: board,
+          {children}
         }
       }
     }
@@ -179,35 +176,48 @@ pub fn HyphaBoardProvider(children: Element) -> Element {
             class: "flex flex-row justify-center",
             div {
               class: "w-[30rem] mt-32 flex flex-col items-center max-h-[40rem] overflow-auto",
-              for board in context.get().boards {
-                div {
-                  class: "flex flex-row w-[26rem] mb-4",
-                  strong {
-                    class: "cursor-pointer grow truncate",
-                    onclick: {
-                      let board_title = board.title.clone();
-                      move |_| {
-                        *board_signal.write() = Some(HyphaFileBoardRef { board: board_title.clone() });
+              HyphaSearchProvider {
+                class: "mt-2 mb-4",
+                render: use_callback(move |search| {
+                  let boards = context
+                    .get().boards
+                    .iter()
+                    .cloned()
+                    .filter(|board| board.title.starts_with(&search))
+                    .collect::<Vec<_>>();
+                  rsx! {
+                    for board in boards {
+                      div {
+                        class: "flex flex-row w-[26rem] mb-4",
+                        strong {
+                          class: "cursor-pointer grow truncate",
+                          onclick: {
+                            let board_title = board.title.clone();
+                            move |_| {
+                              *board_signal.write() = Some(HyphaFileBoardRef { board: board_title.clone() });
+                            }
+                          },
+                          "{board.title.clone()}"
+                        }
+                        span {
+                          class: "cursor-pointer",
+                          onclick: {
+                            let board_title = board.title.clone();
+                            move |_| {
+                              context.remove_board(HyphaFileBoardRef { board: board_title.clone() });
+                            }
+                          },
+                          Icon {
+                            class: "text-red-500 mt-[5px]",
+                            width: 20,
+                            height: 20,
+                            icon: FaCircleXmark
+                          }
+                        }
                       }
-                    },
-                    "{board.title.clone()}"
-                  }
-                  span {
-                    class: "cursor-pointer",
-                    onclick: {
-                      let board_title = board.title.clone();
-                      move |_| {
-                        context.remove_board(HyphaFileBoardRef { board: board_title.clone() });
-                      }
-                    },
-                    Icon {
-                      class: "text-red-500 mt-[5px]",
-                      width: 20,
-                      height: 20,
-                      icon: FaCircleXmark
                     }
                   }
-                }
+                })
               }
             }
           }
@@ -265,7 +275,7 @@ pub fn HyphaResizeProvider(children: Element) -> Element {
 
   rsx! {
     div {
-      class: "absolute w-full h-full",
+      class: "min-h-[100vh]",
       onmousemove: move |e| {
         let position_before = signal.read().position;
         let position_after = e.client_coordinates();
@@ -290,6 +300,33 @@ pub fn HyphaResizeProvider(children: Element) -> Element {
       },
       {children}
     }
+  }
+}
+
+#[component]
+pub fn HyphaSearchProvider(
+  class: Option<String>,
+  style: Option<String>,
+  render: Callback<String, Element>,
+) -> Element {
+  let class = class.unwrap_or(String::new());
+  let style = style.unwrap_or(String::new());
+
+  let mut signal = use_signal(|| HyphaSearch {
+    search: String::new(),
+  });
+  use_context_provider(|| HyphaSearchContext::new(signal));
+
+  rsx! {
+    input {
+      class: class,
+      style: style,
+      value: signal.read().search.clone(),
+      oninput: move |e| {
+        signal.write().search = e.value();
+      }
+    }
+    {render(signal.read().search.clone())}
   }
 }
 
